@@ -3,6 +3,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:feature_discovery/feature_discovery.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:path_provider/path_provider.dart';
@@ -21,6 +22,19 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final _controller = ScreenshotController();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+
+    FeatureDiscovery.clearPreferences(context, <String>{
+      'ver_tarjeta',
+      'cambiar_foto',
+      'show_tutorial',
+    });
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Screenshot(
@@ -85,51 +99,101 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   Column(
                     children: [
-                      MaterialButton(
-                        onPressed: () {},
-                        child: Icon(
-                          Icons.credit_card,
-                          size: 30,
-                        ),
-                        color: Colors.indigo,
+                      DescribedFeatureOverlay(
+                        featureId:
+                            'ver_tarjeta', // Unique id that identifies this overlay.
+                        tapTarget: const Icon(Icons
+                            .credit_card), // The widget that will be displayed as the tap target.
+                        title: Text('Ver Tarjeta'),
+                        description: Text(
+                            'Presiona para ver las tarjetas asociadas a tu cuenta.'),
+                        backgroundColor: Theme.of(context).primaryColor,
+                        targetColor: Colors.white,
                         textColor: Colors.white,
-                        shape: CircleBorder(),
-                        padding: EdgeInsets.all(16),
+                        child: MaterialButton(
+                          onPressed: () {},
+                          child: Icon(
+                            Icons.credit_card,
+                            size: 30,
+                          ),
+                          color: Colors.indigo,
+                          textColor: Colors.white,
+                          shape: CircleBorder(),
+                          padding: EdgeInsets.all(16),
+                        ),
                       ),
                       Text("Ver tarjeta"),
                     ],
                   ),
                   Column(
                     children: [
-                      MaterialButton(
-                        onPressed: () {
-                          BlocProvider.of<ChangePictureBloc>(context)
-                              .add(ChangePictureStartEvent());
-                        },
-                        child: Icon(
-                          Icons.camera_alt,
-                          size: 30,
-                        ),
-                        color: Colors.orange,
+                      DescribedFeatureOverlay(
+                        featureId:
+                            'cambiar_foto', // Unique id that identifies this overlay.
+                        tapTarget: const Icon(Icons
+                            .camera_alt), // The widget that will be displayed as the tap target.
+                        title: Text('Cambiar Foto'),
+                        description:
+                            Text('Presiona para cambiar la foto de tu cuenta.'),
+                        backgroundColor: Theme.of(context).primaryColor,
+                        targetColor: Colors.white,
                         textColor: Colors.white,
-                        shape: CircleBorder(),
-                        padding: EdgeInsets.all(16),
+                        child: MaterialButton(
+                          onPressed: () {
+                            BlocProvider.of<ChangePictureBloc>(context)
+                                .add(ChangePictureStartEvent());
+                          },
+                          child: Icon(
+                            Icons.camera_alt,
+                            size: 30,
+                          ),
+                          color: Colors.orange,
+                          textColor: Colors.white,
+                          shape: CircleBorder(),
+                          padding: EdgeInsets.all(16),
+                        ),
                       ),
                       Text("Cambiar Foto"),
                     ],
                   ),
                   Column(
                     children: [
-                      MaterialButton(
-                        onPressed: () {},
-                        child: Icon(
-                          Icons.play_arrow,
-                          size: 30,
-                        ),
-                        color: Colors.green,
+                      DescribedFeatureOverlay(
+                        featureId:
+                            'show_tutorial', // Unique id that identifies this overlay.
+                        tapTarget: const Icon(Icons
+                            .play_arrow), // The widget that will be displayed as the tap target.
+                        title: Text('Inicia el tutorial'),
+                        description: Text('Presiona para ver este tutorial.'),
+                        backgroundColor: Theme.of(context).primaryColor,
+                        targetColor: Colors.white,
                         textColor: Colors.white,
-                        shape: CircleBorder(),
-                        padding: EdgeInsets.all(16),
+                        child: MaterialButton(
+                          onPressed: () {
+                            FeatureDiscovery.clearPreferences(context, <String>{
+                              'ver_tarjeta',
+                              'cambiar_foto',
+                              'show_tutorial',
+                            });
+                            FeatureDiscovery.discoverFeatures(
+                              context,
+                              const <String>{
+                                // Feature ids for every feature that you want to showcase in order.
+                                'ver_tarjeta',
+                                'cambiar_foto',
+                                'show_tutorial',
+                              },
+                            );
+                          },
+                          child: Icon(
+                            Icons.play_arrow,
+                            size: 30,
+                          ),
+                          color: Colors.green,
+                          textColor: Colors.white,
+                          shape: CircleBorder(),
+                          padding: EdgeInsets.all(16),
+                        ),
                       ),
                       Text("Ver Tutorial"),
                     ],
